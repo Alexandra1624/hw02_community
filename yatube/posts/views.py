@@ -1,38 +1,24 @@
 from django.shortcuts import render, get_object_or_404
-
 from .models import Post, Group
 
+NUMBER_POSTS = 10
 
-# Главная страница
+
 def index(request):
     title = 'Последние обновления на сайте'
-    # Одна строка вместо тысячи слов на SQL:
-    # в переменную posts будет сохранена выборка из 10 объектов модели Post,
-    # отсортированных по полю pub_date по убыванию
-    # (от больших значений к меньшим)
-    posts = Post.objects.order_by('-pub_date')[:10]
-    # В словаре context отправляем информацию в шаблон
+    posts = Post.objects.select_related('group').all()[:NUMBER_POSTS]
     context = {
         'title': title,
         'posts': posts,
     }
-    # Третьим параметром передаём словарь context
+
     return render(request, 'posts/index.html', context)
 
 
-# Страница со списком постов
-# View-функция для страницы сообщества:
 def group_posts(request, slug):
-    # Функция get_object_or_404 получает по заданным критериям объект
-    # из базы данных или возвращает сообщение об ошибке, если объект не найден.
-    # В нашем случае в переменную group будут переданы объекты модели Group,
-    # поле slug у которых соответствует значению slug в запросе
     group = get_object_or_404(Group, slug=slug)
 
-    # Метод .filter позволяет ограничить поиск по критериям.
-    # Это аналог добавления
-    # условия WHERE group_id = {group_id}
-    posts = Post.objects.filter(group=group).order_by('-pub_date')[:10]
+    posts = group.posts.all()[:NUMBER_POSTS]
     context = {
         'group': group,
         'posts': posts,

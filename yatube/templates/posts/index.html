@@ -23,25 +23,13 @@
     <main>
       <article>
         {% for post in posts %}
-        <ul>
-          <li>
-            Автор: {{ post.author.get_full_name }}
-          </li>
-          <li>
-            Дата публикации: {{ post.pub_date|date:"d E Y" }}
-          </li>
-        </ul>
-        <p>{{ post.text }}</p>
-        <a href="{% url 'posts:group_posts' post.group.slug %}">все записи группы</a>
-        {% if not forloop.last %}<hr>{% endif %}
+          {% include 'includes/show_post.html' %}
+          {% if post.group.title != None %}
+            <a href="{% url 'posts:group_posts' post.group.slug %}">все записи группы</a>
+          {% endif %}
         {% endfor %}
       </article>
-
-
     </main>
-    <!-- Использованы классы бустрапа: -->
-    <!-- border-top: создаёт тонкую линию сверху блока -->
-    <!-- text-center: выравнивает текстовые блоки внутри блока по центру -->
-    <!-- py-3: контент внутри размещается с отступом сверху и снизу -->
+
     {% include 'includes/footer.html' %}
   </body>
